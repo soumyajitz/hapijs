@@ -3,32 +3,33 @@ const Hapi = require('hapi');
 const server = new Hapi.Server();
 server.connection({ port: 4000 });
 
-server.route({
-    method: 'GET',
-    path: '/en',
-    handler: function(request, reply) {
-        reply('Hello');
-    }
-});
-
-const plugin = function(server, options, next) {
-    server.route({
+server.route([{
+        method: 'GET',
+        path: '/en',
+        handler: function(request, reply) {
+            reply('Hello');
+        }
+    },
+    {
         method: 'GET',
         path: '/cn',
         handler: function(request, reply) {
             reply('Hello China');
         }
-    });
-    
-    next();
-};
+    }
+]);
 
-
-plugin.attributes = {
-    name: "My plugin"
-}
-
-server.register(plugin,(err) => {
+server.register({
+    register: require('good'),
+    options: {
+        reporters: [{
+            reporter: require('good-console'),
+            events: {
+                response: '*'
+            }
+        }]
+    }
+    },(err) => {
     if(err) 
         throw err;
 
